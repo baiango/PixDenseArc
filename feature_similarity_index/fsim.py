@@ -4,22 +4,32 @@ import numpy as np
 from scipy.ndimage import gaussian_filter
 
 def fsim(gray1, gray2):
+	"""
+	Calculates the Feature Similarity Index (FSIM) between two grayscale
+	images. FSIM is a measure used to quantify how similar two images are,
+	particularly in terms of their prominent features like edges.
+	"""
 	edges_img1 = canny_edge_detector(gray1)
 	edges_img2 = canny_edge_detector(gray2)
 
 	return ms_ssim(edges_img1, edges_img2)
 
-def fsim_image(img1, img2):
-	fsim_score = 0
+def fsim_rgb(img1, img2):
+	img1 = np.array(img1)
+	img2 = np.array(img2)
+	fsim_score = [0.0, 0.0, 0.0]
 
 	# Split each image into R, G, B channels
 	for i in range(3):
 		channel_img1 = img1[:, :, i]
 		channel_img2 = img2[:, :, i]
 
-		fsim_score += fsim(channel_img1, channel_img2)
+		fsim_score[i] = fsim(channel_img1, channel_img2)
 
-	return fsim_score / 3.0
+	return fsim_score
+
+def fsim_rgb_sum(img1, img2):
+	return sum(fsim_rgb(img1, img2)) / 3.0
 
 
 if __name__ == "__main__":

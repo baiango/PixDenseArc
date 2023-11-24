@@ -2,6 +2,35 @@ import numpy as np
 
 
 def rgb_to_ycocg(rgb):
+	"""
+	Convert a color from RGB (Red, Green, Blue) space to YCoCg
+	(Luma, Orange Chroma, Green Chroma) space.
+
+	YCoCg is a color space where 'Y' shows how bright the color is, 'Co' shows
+	the difference between red and blue, and 'Cg' shows the difference between
+	green and the average of red and blue.
+
+	Note on Co and Cg:
+	-	'Co' (Orange Chroma) is found by looking at the difference between red
+		and blue. Changes in 'Co' are not as easily seen by our eyes compared
+		to changes in 'Y' (brightness).
+	-	'Cg' (Green Chroma) is found by looking at the difference between green
+		and the average of red and blue. Like 'Co', changes in 'Cg' are also
+		less noticeable compared to changes in brightness.
+
+	This is useful in making images and videos smaller (compression) because we
+	can reduce the amount of color information (Co and Cg) more than the
+	brightness information (Y) without making a big difference to how the image
+	looks to us.
+
+	Works Well with Chroma Subsampling 4:2:0:
+	-	YCoCg is great for a type of video compression called chroma
+		subsampling 4:2:0. In this method, we reduce the color information more
+		than the brightness information. Since we don't easily notice changes
+		in color detail, this makes the image or video smaller without making
+		it look much different, which helps in saving space and making files
+		smaller.
+	"""
 	r, g, b = rgb[0], rgb[1], rgb[2]
 
 	co = r - b

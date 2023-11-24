@@ -2,6 +2,27 @@ import numpy as np
 
 
 def karhunen_loeve_transform(image):
+	"""
+	Key Terms:
+	-	Mean: This is like the average color or intensity for each column in
+		the image. It's calculated to normalize the image, making sure we focus
+		on the unique differences in the image rather than the overall average
+		color or intensity.
+
+	-	Covariance Matrix: Think of this as a report that tells us how
+		different parts of the image are related to each other. It helps us
+		understand the relationships between various parts of the image,
+		showing if changes in one part (like getting brighter or darker) are
+		related to changes in another part.
+
+	-	Eigenvalues and Eigenvectors: These are mathematical tools that help us
+		find the most interesting parts of the image.
+		-	Eigenvalues tell us how much 'action' or variation is in each part
+			of the image. Higher eigenvalues mean more important information.
+		-	Eigenvectors point to the directions in the image where there's the
+			most variation or change. They help us identify the most striking
+			features or patterns in the image, like edges or unique colors.
+	"""
 	# Calculate the mean of the image
 	mean = np.mean(image, axis=0)
 
@@ -25,6 +46,17 @@ def karhunen_loeve_transform(image):
 
 
 def generate_mean_and_eigenvectors(img):
+	"""
+	Calculates the mean and sorted eigenvectors of an image, which are
+	essential components for image transformation and reconstruction.
+
+	This function computes two key elements from the image data:
+	1.	Mean: The average of each column in the image, representing the average
+		value across all pixels.
+	2.	Sorted Eigenvectors: These are calculated from the covariance matrix
+		of the image and represent the principal components or the directions
+		in which the image data varies the most.
+	"""
 	mean = np.mean(img, axis=0)
 	covariance_matrix = np.cov(img, rowvar=False)
 	eigenvalues, eigenvectors = np.linalg.eigh(covariance_matrix)
@@ -49,24 +81,34 @@ def remap(a, a_min, a_max, b_min, b_max):
 
 def bitwise_and_sign_subtract(img, value):
 	"""
-	Conditionally adjusts each pixel in an image for compression purposes by manipulating its least significant bits.
+	This function tweaks the finer, less noticeable parts of a pixel's value.
+	The idea is to make these details more consistent across the image, which
+	helps in compressing the image better.
 
-	This function targets the least significant bits of pixel values. By converting each pixel
-	value to its absolute value, applying a bitwise AND with 'value', and then conditionally
-	subtracting or adding this result based on the original sign (positive or negative), the
-	function can effectively reduce randomness in these lower bits. This is useful in image
-	compression scenarios where reducing randomness or 'noise' in the least significant bits
-	can lead to better compression efficiency.
-
-	The function operates by first converting each pixel value to its absolute value. Then, it applies a bitwise
-	AND operation with the specified value. Depending on whether the original pixel value was positive or negative,
-	it either subtracts or adds the result of this bitwise operation to the original pixel value.
+	Here's a simpler way to understand what's happening:
+	-	Think of each pixel value in the image as a series of switches (bits),
+		where each switch can be either on or off. For example, the number 123
+		in binary (switch) form is 01111011.
+	-	We focus on the less noticeable switches (the rightmost bits) in each
+		pixel's value.
+	-	The 'value' you provide acts like a filter, deciding which of these
+		switches we should pay attention to.
+	-	If we use 15 (0xf, or 00001111 in binary) as the value, it means we're
+		focusing on the last 4 bits of the pixel's value. So, 123 becomes 11
+		(00001011 in binary).
+	-	Depending on the original shade of the pixel (lighter or darker),
+		we then adjust the pixel's value slightly by adding or subtracting
+		this new number.
 
 	Parameters:
-	img (np.array): The input image array.
-	value (int): A bitwise mask used for the AND operation. Typical values for reducing randomness in
-				 compression include 0xf (ignores the first 4 bits), as well as other hexadecimal values
-				 like 0x1, 0x3, 0x7, 0x1f (31), 0x3f (63), 0x7f (127), and 0xff (255).
+	img (np.array):	The input image array. Imagine this as a collection of
+					pixels, where each pixel is represented by a number.
+	value (int):	A number that acts as a filter for the pixel's value.
+					Typical values include:
+					-	0xf (15 in decimal): Ignores the first 4 bits.
+					-	Other values like 0x1, 0x3, 0x7, 0x1f (31), 0x3f (63),
+						0x7f (127), and 0xff (255) can also be used,
+						each focusing on different parts of the pixel's value.
 	"""
 	img = img.astype(np.int64)
 	sign_mask = np.sign(img)
