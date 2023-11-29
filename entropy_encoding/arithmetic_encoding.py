@@ -149,41 +149,47 @@ def arithmetic_encode(message, symbol_probabilities):
 
 def arithmetic_decode(encoded_number, symbol_probabilities, message_length):
 	"""
-	Encoding example:
-	1.	First Character:
-	-	The initial interval [0, 1] is divided into:
-		-	[0, 1/3] for 'k'
-		-	[1/3, 2/3] for 'i'
-		-	[2/3, 1] for 'w'
-	-	The fraction 33/162 falls in the interval [1/3, 2/3], so the first
-		character is 'i'.
+	Decoding example:
+	To decode the fraction 33/162 back into the string "kiwi" using the given
+	probabilities, we follow the reverse process of arithmetic encoding.
+	Here's how it would work:
 
-	2.	Second Character:
-	-	Update the interval to [1/3, 2/3] and divide it:
-		-	[1/3, 1/2] for 'k'
-		-	[1/2, 5/6] for 'i'
-		-	[5/6, 2/3] for 'w'
-	-	The fraction 33/162, when scaled to this new interval, falls in
-		[1/3, 1/2], so the second character is 'k'.
+	1. Start with the encoded fraction: We have the fraction 33/162.
+	2. Initialize the interval: The full interval is [0, 1].
+	3. Determine the symbol for each step:
+	-	Check which interval the fraction 33/162 falls into based on our symbol
+		probabilities:
+		-	'k': [0, 1/3]
+		-	'i': [1/3, 2/3]
+		-	'w': [2/3, 1]
 
-	3.	Third Character:
-	-	Update the interval to [1/3, 1/2] and divide it:
-		-	[1/3, 7/18] for 'k'
-		-	[7/18, 11/18] for 'i'
-		-	[11/18, 1/2] for 'w'
-	-	The fraction 33/162, now scaled to this new interval, falls in
-		[11/18, 1/2], so the third character is 'w'.
+	For each step, find the symbol whose range contains the fraction:
+	a.	First Symbol:
+		-	33/162 falls in [0, 1/3], so the first symbol is 'k'.
+	b.	Adjust the interval and fraction for the next symbol:
+		-	The new interval for 'k' is [0, 1/3]. Scale the fraction to fit in
+			this new interval:
+				33/162, when scaled to fit in [0, 1/3],
+				becomes 33/162 * 3 = 99/162.
+	c.	Second Symbol:
+		-	99/162 falls in [1/3, 2/3], so the second symbol is 'i'.
+		-	Adjust the interval for 'i', which is [1/3, 2/3].
+			Scale the fraction to fit in this interval:
+				([99/162] - 1/3) * 3 = 33/162.
+	d.	Third Symbol:
+		-	33/162 falls in [2/3, 1], so the third symbol is 'w'.
+		-	Adjust the interval for 'w', which is [2/3, 1].
+			Scale the fraction to fit in this interval:
+				([33/162] - 2/3) * 3 = 33/162.
+	e.	Fourth Symbol:
+		-	33/162 falls in [1/3, 2/3], so the fourth symbol is 'i'.
 
-	4.	Fourth Character:
-	-	Update the interval to [11/18, 1/2] and divide it:
-		-	[11/18, 13/24] for 'k'
-		-	[13/24, 17/24] for 'i'
-		-	[17/24, 1/2] for 'w'
-	-	The fraction 33/162, scaled to this interval, falls in [13/24, 17/24],
-		so the fourth character is 'i'.
-
-	So, by repeating this process for each character and updating the intervals
-	accordingly, we decode 33/162 back into the original message "KIWI".
+	4.	Combine the symbols:
+		We've determined the sequence of symbols to be "kiwi".
+		So, by decoding the fraction 33/162 using the given probabilities,
+		we retrieve the original string "kiwi". This decoding process involves
+		determining which symbol's range contains the fraction at each step and
+		then scaling and shifting the fraction to prepare for the next step.
 	"""
 	lower_bound = Fraction(0, 1)
 	upper_bound = Fraction(1, 1)
